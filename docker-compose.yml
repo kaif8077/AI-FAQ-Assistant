@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: faq_assistant
+    volumes:
+      - mongo_data:/data/db
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://admin:pass@mongodb:27017/faq_assistant?authSource=admin
+      HF_API_TOKEN: ${HF_API_TOKEN}
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+volumes:
+  mongo_data:
